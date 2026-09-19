@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unblocked Games</title>
+    <style>
+        /* Modern Dark Theme */
+        :root {
+            --bg-color: #121212;
+            --nav-bg: #1f1f1f;
+            --text-color: #ffffff;
+            --accent-color: #bb86fc;
+            --card-bg: #292929;
+            --hover-color: #3d3d3d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navigation Bar */
+        nav {
+            background-color: var(--nav-bg);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        nav h1 {
+            font-size: 1.8rem;
+            color: var(--accent-color);
+            letter-spacing: 1px;
+        }
+
+        /* The Replit Browser Button */
+        .replit-btn {
+            background-color: var(--accent-color);
+            color: #000;
+            text-decoration: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .replit-btn:hover {
+            background-color: #d1b3ff;
+            transform: translateY(-2px);
+        }
+
+        /* Main Content Container */
+        main {
+            flex: 1;
+            padding: 3rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        /* Games Grid System */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Individual Game Buttons */
+        .game-card {
+            background-color: var(--card-bg);
+            text-decoration: none;
+            color: var(--text-color);
+            padding: 2rem 1rem;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .game-card:hover {
+            background-color: var(--hover-color);
+            border-color: var(--accent-color);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(187, 134, 252, 0.2);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--nav-bg);
+            text-align: center;
+            padding: 1rem;
+            margin-top: auto;
+            font-size: 0.9rem;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <h1>🎮 Unblocked Games</h1>
+        <!-- PUT YOUR REPLIT BROWSER LINK IN THE href BELOW -->
+        <a href="PUT_YOUR_LINK_HERE" class="replit-btn" target="_blank">🌐 Web Browser (Replit)</a>
+    </nav>
+
+    <main>
+        <h2 class="section-title">Choose a Game</h2>
+        
+        <div class="games-grid">
+            <!-- Game 1 -->
+            <!-- Replace 'game1.html' with the actual link to your game -->
+            <a href="game1.html" class="game-card">1v1.LOL</a>
+
+            <!-- Game 2 -->
+            <a href="game2.html" class="game-card">Retro Bowl</a>
+
+            <!-- Game 3 -->
+            <a href="game3.html" class="game-card">Slope</a>
+
+            <!-- Game 4 -->
+            <a href="game4.html" class="game-card">BitLife</a>
+
+            <!-- Game 5 -->
+            <a href="game5.html" class="game-card">Subway Surfers</a>
+
+            <!-- Game 6 -->
+            <a href="game6.html" class="game-card">Cookie Clicker</a>
+
+            <!-- You can easily add more games by copying the line below -->
+            <!-- <a href="link-to-game" class="game-card">Game Name</a> -->
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Unblocked Games. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>
+
