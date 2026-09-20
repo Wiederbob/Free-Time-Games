@@ -1,0 +1,591 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free Time Games</title>
+<meta name="description" content="Free browser games. Pick one and play.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232CFF6B'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+/* Free Time Games: shared styles. Matches the dark terminal-green look of Free Time Browse. */
+
+:root {
+  --bg: #030a05;
+  --panel: #07120a;
+  --panel-2: #0a1a10;
+  --line: #155c2b;
+  --line-strong: #1fbf4f;
+  --neon: #2CFF6B;
+  --neon-ink: #03110a;
+  --text: #9df2b5;
+  --dim: #5fb47a;
+  --font: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+html { background: var(--bg); }
+body {
+  margin: 0; min-height: 100vh;
+  display: flex; flex-direction: column;
+  background: var(--bg); color: var(--text);
+  font-family: var(--font); font-size: 15px; line-height: 1.5;
+}
+body.playing { overflow: hidden; }
+
+:focus-visible { outline: 3px solid var(--neon); outline-offset: 3px; }
+
+.sr {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+/* ---------- Header ---------- */
+.top { border-bottom: 1px solid var(--line); }
+.top-in {
+  max-width: 1280px; margin: 0 auto;
+  padding: 12px clamp(14px, 3vw, 32px);
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  align-items: center; gap: 12px;
+}
+.brand {
+  justify-self: start;
+  display: flex; align-items: center; gap: 12px;
+  color: var(--neon); text-decoration: none;
+  font-weight: 800; font-size: clamp(16px, 2.4vw, 20px); letter-spacing: -.01em;
+}
+.mark {
+  width: 36px; height: 36px; flex: none;
+  display: grid; place-items: center;
+  background: var(--neon); border-radius: 10px;
+  box-shadow: 0 0 16px rgba(44, 255, 107, .35);
+}
+.nav { display: flex; gap: 26px; }
+.nav a { color: var(--dim); font-weight: 600; text-decoration: none; padding: 6px 2px; }
+.nav a:hover { color: var(--text); }
+.nav a[aria-current="page"] { color: var(--neon); font-weight: 800; }
+
+/* ---------- Window frame ---------- */
+.stage {
+  flex: 1; width: 100%; max-width: 1280px; margin: 0 auto;
+  display: flex; flex-direction: column;
+  padding: clamp(10px, 2vw, 20px) clamp(10px, 3vw, 32px) 32px;
+}
+.window {
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column;
+  background: var(--panel);
+  border: 2px solid var(--line-strong); border-radius: 18px;
+  box-shadow: 0 0 28px rgba(44, 255, 107, .12);
+  overflow: hidden;
+}
+
+.tabs {
+  display: flex; align-items: flex-end; gap: 8px;
+  padding: 10px 14px 0;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+}
+.tab {
+  font: inherit; font-size: 14px; font-weight: 600; white-space: nowrap;
+  color: var(--dim); background: transparent;
+  border: 1px solid var(--line); border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+  padding: 9px 18px; cursor: pointer;
+}
+.tab:hover { color: var(--text); }
+.tab[aria-pressed="true"] {
+  position: relative; top: 1px;
+  color: var(--neon); font-weight: 800;
+  background: var(--bg); border-color: var(--line-strong);
+}
+.tab:focus-visible { outline-offset: -3px; }
+
+.toolbar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+
+/* Search styled like the browser's address bar */
+.addr {
+  flex: 1; min-width: 0;
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 6px 0 16px;
+  background: var(--panel);
+  border: 2px solid var(--line-strong); border-radius: 999px;
+  cursor: text;
+}
+.addr:focus-within { border-color: var(--neon); box-shadow: 0 0 0 3px rgba(44, 255, 107, .2); }
+.addr > svg { flex: none; color: var(--dim); }
+.addr input {
+  -webkit-appearance: none; appearance: none;
+  flex: 1; min-width: 0;
+  font: inherit; color: var(--text);
+  background: transparent; border: 0; outline: 0;
+  padding: 10px 0;
+}
+.addr input::placeholder { color: var(--dim); }
+.go {
+  flex: none; width: 28px; height: 28px;
+  display: grid; place-items: center;
+  background: var(--neon); color: var(--neon-ink);
+  border-radius: 50%;
+}
+
+.pill {
+  display: inline-block;
+  font: inherit; font-size: 14px; font-weight: 600; white-space: nowrap;
+  text-decoration: none;
+  color: var(--neon); background: transparent;
+  border: 2px solid var(--line-strong); border-radius: 999px;
+  padding: 7px 16px; cursor: pointer;
+}
+.pill:hover { background: var(--neon); border-color: var(--neon); color: var(--neon-ink); }
+
+/* ---------- Games grid ---------- */
+.content { flex: 1; background: var(--bg); padding: 18px clamp(14px, 2.5vw, 26px) 26px; }
+
+.label {
+  display: flex; align-items: center; justify-content: space-between;
+  margin: 0 0 16px; padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+  font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--dim);
+}
+.dots { display: flex; gap: 6px; }
+.dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--neon); }
+
+.grid {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
+}
+.card {
+  width: 100%;
+  display: flex; flex-direction: column; gap: 12px;
+  padding: 12px; text-align: left;
+  font: inherit; color: var(--text);
+  background: var(--panel-2);
+  border: 2px solid var(--line); border-radius: 16px;
+  cursor: pointer;
+  transition: border-color .15s, box-shadow .15s;
+}
+.card:hover { border-color: var(--neon); box-shadow: 0 0 20px rgba(44, 255, 107, .18); }
+.card:focus-visible { outline-offset: 2px; }
+
+.art {
+  aspect-ratio: 16 / 10; overflow: hidden;
+  display: grid; place-items: center;
+  font-size: 44px; line-height: 1;
+  background: var(--bg);
+  border: 1px solid var(--line); border-radius: 10px;
+}
+.art img { width: 100%; height: 100%; object-fit: cover; }
+.name { display: block; font-size: 18px; font-weight: 800; color: var(--neon); line-height: 1.2; }
+.cat { display: block; font-size: 13px; color: var(--dim); }
+
+.empty { margin: 28px 0; font-size: 16px; }
+
+/* ---------- Game player ---------- */
+.player {
+  position: fixed; inset: 0; z-index: 10;
+  display: flex; flex-direction: column;
+  background: var(--bg);
+}
+.pbar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  background: var(--panel); border-bottom: 1px solid var(--line);
+}
+.ptitle {
+  flex: 1; min-width: 0; margin: 0;
+  padding: 7px 16px;
+  font-size: 14px; font-weight: 600; color: var(--text);
+  border: 2px solid var(--line); border-radius: 999px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+#frame { flex: 1; width: 100%; border: 0; background: #000; }
+
+/* ---------- Browser page ---------- */
+.urlpill {
+  flex: 1; min-width: 0;
+  padding: 8px 16px;
+  font-size: 14px; color: var(--text);
+  background: var(--panel);
+  border: 2px solid var(--line); border-radius: 999px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.viewport { flex: 1; display: flex; flex-direction: column; min-height: 0; background: var(--bg); }
+.bframe { flex: 1; width: 100%; min-height: 520px; border: 0; background: #000; }
+.note { margin: 12px 4px 0; font-size: 13px; color: var(--dim); }
+
+.setup {
+  width: min(640px, 100%); margin: auto;
+  padding: 22px;
+  background: var(--panel);
+  border: 2px solid var(--line-strong); border-radius: 22px;
+  box-shadow: 0 0 28px rgba(44, 255, 107, .12);
+}
+.setup p { margin: 0 0 14px; }
+.setup pre {
+  margin: 0; padding: 14px; overflow-x: auto;
+  font: inherit; font-size: 13px; color: var(--neon);
+  background: var(--bg);
+  border: 1px solid var(--line); border-radius: 12px;
+}
+.setup code { font: inherit; }
+.viewport-pad { padding: 18px; display: flex; flex: 1; }
+
+/* ---------- Small screens ---------- */
+@media (max-width: 600px) {
+  .top-in { grid-template-columns: 1fr auto; }
+  .top-in > span { display: none; }
+  .ptitle { display: none; }
+  #reload { margin-left: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card { transition: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <a class="brand" href="#/">
+      <span class="mark" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#03110a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/></svg>
+      </span>
+      <span id="brand-name">Free Time Games</span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a href="#/" id="nav-games" aria-current="page">Games</a>
+      <a href="#/browser" id="nav-browser">Browser</a>
+    </nav>
+    <span aria-hidden="true"></span>
+  </div>
+</header>
+
+<main class="stage">
+  <section class="window" id="games-view" aria-label="Games">
+    <div class="tabs" id="tabs" role="group" aria-label="Filter by category"></div>
+
+    <div class="toolbar">
+      <label class="addr">
+        <span class="sr">Search games</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="search" id="q" placeholder="Search games" autocomplete="off">
+        <span class="go" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </span>
+      </label>
+    </div>
+
+    <div class="content">
+      <div class="label">
+        <span id="label" aria-live="polite">Games</span>
+        <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      </div>
+      <ul class="grid" id="grid"></ul>
+      <p class="empty" id="empty" hidden></p>
+    </div>
+  </section>
+
+  <section class="window" id="browser-view" aria-label="Browser" hidden>
+    <div class="viewport">
+      <iframe class="bframe" id="bframe" title="Free Time Browse" hidden
+              allow="fullscreen; clipboard-read; clipboard-write; autoplay"
+              allowfullscreen></iframe>
+
+      <div class="viewport-pad" id="bsetup" hidden>
+        <div class="setup">
+          <div class="label">
+            <span>Browser // not linked</span>
+            <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          </div>
+          <p>Add the link to your Replit browser at the top of index.html, then reload this page.</p>
+<pre><code>window.SITE = {
+  name: "Free Time Games",
+  browserUrl: "https://your-app.replit.app"
+};</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<section class="player" id="player" hidden aria-label="Game player">
+  <div class="pbar">
+    <button type="button" class="pill" id="back">Back to games</button>
+    <h2 class="ptitle" id="ptitle"></h2>
+    <button type="button" class="pill" id="reload">Restart</button>
+    <button type="button" class="pill" id="fs">Fullscreen</button>
+  </div>
+  <iframe id="frame" title="Game"
+          sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-popups allow-forms"
+          allow="fullscreen; gamepad" allowfullscreen></iframe>
+</section>
+
+<script>
+/*
+  EDIT HERE: site name, browser link, and the list of games.
+
+  browserUrl   The link to your Replit browser (starts with https://).
+               Leave it empty and the Browser page shows setup instructions.
+
+  To add a game:
+    1. Put its files in a folder under games/ (for example games/my-game/index.html).
+    2. Add an entry to the list below. There is an example you can copy.
+
+  Fields:
+    id        Unique, lowercase, no spaces. Used in the page link (yoursite/#/my-game).
+              Do not use "browser" as an id.
+    title     Name shown on the card.
+    category  Groups games under a tab. Keep the spelling identical between games.
+    url       Path to the game inside this repo, or a full https:// link.
+    icon      Optional. An emoji shown on the card.
+    tags      Optional. Extra words that search will match.
+    thumb     Optional. Path to an image to show instead of the icon.
+
+  Only add games you made, or games whose license lets you host or embed them.
+  Some sites block embedding, so a link to another site may show a blank frame.
+*/
+window.SITE = {
+  name: "Free Time Games",
+  browserUrl: "https://free-time-games--bobbywiederman.replit.app/"
+};
+
+window.GAMES = [
+  // Add your games here, one entry per game, separated by commas. Example:
+  // {
+  //   id: "my-game",
+  //   title: "My Game",
+  //   category: "Arcade",
+  //   url: "games/my-game/index.html",
+  //   icon: "🎮",
+  //   tags: ["classic"]
+  // }
+];
+</script>
+<script>
+(function () {
+  "use strict";
+
+  var SITE = window.SITE || { name: "Free Time Games" };
+  var GAMES = window.GAMES || [];
+
+  var $ = function (id) { return document.getElementById(id); };
+  var grid = $("grid"), tabs = $("tabs"), label = $("label"), empty = $("empty");
+  var q = $("q"), player = $("player"), frame = $("frame"), ptitle = $("ptitle");
+
+  var state = { cat: "All", query: "" };
+  var cameFromGrid = false;
+  var lastCard = null;
+
+  document.title = SITE.name;
+  $("brand-name").textContent = SITE.name;
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text) n.textContent = text;
+    return n;
+  }
+
+  /* ---------- Category tabs ---------- */
+  function buildTabs() {
+    var cats = ["All"];
+    GAMES.forEach(function (g) {
+      if (g.category && cats.indexOf(g.category) < 0) cats.push(g.category);
+    });
+    cats.forEach(function (c) {
+      var b = el("button", "tab", c === "All" ? "All games" : c);
+      b.type = "button";
+      b.dataset.cat = c;
+      b.setAttribute("aria-pressed", String(c === state.cat));
+      b.addEventListener("click", function () {
+        state.cat = c;
+        syncTabs();
+        renderGrid();
+      });
+      tabs.appendChild(b);
+    });
+  }
+  function syncTabs() {
+    Array.prototype.forEach.call(tabs.children, function (b) {
+      b.setAttribute("aria-pressed", String(b.dataset.cat === state.cat));
+    });
+  }
+
+  /* ---------- Game grid ---------- */
+  function matches(g) {
+    if (state.cat !== "All" && g.category !== state.cat) return false;
+    if (!state.query) return true;
+    var hay = (g.title + " " + (g.category || "") + " " + (g.tags || []).join(" ")).toLowerCase();
+    return hay.indexOf(state.query) > -1;
+  }
+
+  function renderGrid() {
+    var list = GAMES.filter(matches);
+    grid.textContent = "";
+
+    list.forEach(function (g) {
+      var li = document.createElement("li");
+      var b = el("button", "card");
+      b.type = "button";
+
+      var art = el("span", "art");
+      art.setAttribute("aria-hidden", "true");
+      if (g.thumb) {
+        var img = document.createElement("img");
+        img.src = g.thumb; img.alt = ""; img.loading = "lazy";
+        art.appendChild(img);
+      } else {
+        art.textContent = g.icon || g.title.charAt(0);
+      }
+
+      b.appendChild(art);
+      b.appendChild(el("span", "name", g.title));
+      if (g.category) b.appendChild(el("span", "cat", g.category));
+
+      b.addEventListener("click", function () {
+        lastCard = b;
+        cameFromGrid = true;
+        location.hash = "#/" + encodeURIComponent(g.id);
+      });
+
+      li.appendChild(b);
+      grid.appendChild(li);
+    });
+
+    var total = GAMES.length;
+    if (!total) {
+      label.textContent = "Games // none yet";
+      empty.textContent = "No games yet. Add one in the games list at the top of index.html.";
+    } else if (list.length === total) {
+      label.textContent = "Games // " + total + " loaded";
+    } else {
+      label.textContent = "Games // " + list.length + " of " + total + " match";
+    }
+    if (total) empty.textContent = "No games match. Clear the search or pick All games.";
+    empty.hidden = list.length > 0;
+  }
+
+  /* ---------- Player ---------- */
+  function currentGame() {
+    var m = location.hash.match(/^#\/(.+)$/);
+    if (!m) return null;
+    var id;
+    try { id = decodeURIComponent(m[1]); } catch (e) { return null; }
+    return GAMES.filter(function (g) { return g.id === id; })[0] || null;
+  }
+
+  function openGame(g) {
+    if (frame.getAttribute("data-id") !== g.id) {
+      frame.setAttribute("data-id", g.id);
+      frame.title = g.title;
+      frame.src = g.url;
+    }
+    ptitle.textContent = g.title;
+    player.hidden = false;
+    document.body.classList.add("playing");
+    document.title = g.title + " | " + SITE.name;
+  }
+
+  function closeGame(keepFocus) {
+    if (player.hidden) return;
+    player.hidden = true;
+    frame.removeAttribute("data-id");
+    frame.src = "about:blank";
+    document.body.classList.remove("playing");
+    document.title = SITE.name;
+    if (!keepFocus && lastCard && document.body.contains(lastCard)) lastCard.focus();
+  }
+
+  /* ---------- Browser view ---------- */
+  var gamesView = $("games-view"), browserView = $("browser-view");
+  var bframe = $("bframe");
+  var browserUrl = typeof SITE.browserUrl === "string" ? SITE.browserUrl.trim() : "";
+  var browserOk = /^https?:\/\//i.test(browserUrl);
+  var browserLoaded = false;
+
+  if (browserOk) { bframe.hidden = false; } else { $("bsetup").hidden = false; }
+
+  function setCurrent(a, on) {
+    if (on) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+  }
+
+  function showView(name) {
+    var isBrowser = name === "browser";
+    gamesView.hidden = isBrowser;
+    browserView.hidden = !isBrowser;
+    setCurrent($("nav-games"), !isBrowser);
+    setCurrent($("nav-browser"), isBrowser);
+    if (isBrowser && browserOk && !browserLoaded) {
+      browserLoaded = true;
+      bframe.src = browserUrl;
+    }
+    document.title = isBrowser ? "Browser | " + SITE.name : SITE.name;
+  }
+
+  function route() {
+    if (location.hash === "#/browser") {
+      closeGame(true);
+      showView("browser");
+      return;
+    }
+    showView("games");
+    var g = currentGame();
+    if (g) openGame(g); else closeGame();
+  }
+
+  frame.addEventListener("load", function () {
+    if (player.hidden) return;
+    try { frame.contentWindow.focus(); } catch (e) { frame.focus(); }
+  });
+
+  $("back").addEventListener("click", function () {
+    if (cameFromGrid) { cameFromGrid = false; history.back(); }
+    else { location.hash = "#/"; }
+  });
+
+  $("reload").addEventListener("click", function () {
+    var g = currentGame();
+    if (!g) return;
+    frame.src = "about:blank";
+    setTimeout(function () { frame.src = g.url; }, 30);
+  });
+
+  var fs = $("fs");
+  if (frame.requestFullscreen) {
+    fs.addEventListener("click", function () { frame.requestFullscreen(); });
+  } else {
+    fs.hidden = true;
+  }
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !player.hidden && !document.fullscreenElement) $("back").click();
+  });
+
+  /* ---------- Search and startup ---------- */
+  q.addEventListener("input", function () {
+    state.query = q.value.trim().toLowerCase();
+    renderGrid();
+  });
+
+  window.addEventListener("hashchange", route);
+
+  buildTabs();
+  renderGrid();
+  route();
+})();
+</script>
+</body>
+</html>
