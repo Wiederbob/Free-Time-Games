@@ -290,6 +290,10 @@ body.playing { overflow: hidden; }
           </label>
           <button type="submit" class="pill">Unlock</button>
         </div>
+        <label style="display:inline-flex;gap:8px;align-items:center;margin-top:12px;cursor:pointer">
+          <input type="checkbox" id="showpw" style="accent-color:#2CFF6B;width:16px;height:16px;margin:0">
+          Show password
+        </label>
         <p id="gate-msg" role="alert" style="margin:12px 0 0;min-height:1.5em"></p>
       </form>
     </div>
@@ -483,14 +487,14 @@ window.EAGLER = [
     document.title = g.title + " | Eagler Hub | " + SITE_NAME;
   }
 
-  function closeItem() {
+  function closeItem(keepFocus) {
     if (player.hidden) return;
     player.hidden = true;
     frame.removeAttribute("data-id");
     frame.src = "about:blank";
     document.body.classList.remove("playing");
     document.title = "Eagler Hub | " + SITE_NAME;
-    if (lastCard && document.body.contains(lastCard)) lastCard.focus();
+    if (!keepFocus && lastCard && document.body.contains(lastCard)) lastCard.focus();
   }
 
   function route() {
@@ -561,15 +565,12 @@ window.EAGLER = [
   if (!window.crypto || !crypto.subtle) {
     gateMsg.textContent = "This page needs a secure (https) connection to check the password.";
   } else {
-    try { if (sessionStorage.getItem("eh-ok") === PASS_HASH) unlock(); } catch (e) {}
-
     $("gate-form").addEventListener("submit", function (e) {
       e.preventDefault();
       // Phones often type a curly apostrophe; treat it as a normal one.
       var typed = $("pw").value.replace(/[\u2018\u2019]/g, "'");
       sha256(typed).then(function (hash) {
         if (hash === PASS_HASH) {
-          try { sessionStorage.setItem("eh-ok", hash); } catch (err) {}
           gateMsg.textContent = "";
           unlock();
         } else {
@@ -579,6 +580,33 @@ window.EAGLER = [
       });
     });
   }
+
+  $("showpw").addEventListener("change", function () {
+    $("pw").type = this.checked ? "text" : "password";
+    $("pw").focus();
+  });
+
+  /* ---------- Lock again when you leave the tab ---------- */
+  function lock() {
+    if ($("app").hidden) return;
+    closeItem(true);
+    history.replaceState(null, "", location.pathname + location.search);
+    $("app").hidden = true;
+    $("gate").hidden = false;
+    $("pw").value = "";
+    $("pw").type = "password";
+    $("showpw").checked = false;
+    gateMsg.textContent = "";
+  }
+
+  document.addEventListener("visibilitychange", function () {
+    // Stay unlocked while a client is open, so switching tabs doesn't kick you out of it.
+    if (document.hidden && player.hidden) lock();
+  });
+  // Coming back with the Back button can restore a saved, unlocked copy of the page.
+  window.addEventListener("pageshow", function (e) {
+    if (e.persisted) lock();
+  });
 })();
 </script>
 </body>
