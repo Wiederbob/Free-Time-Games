@@ -253,6 +253,8 @@ body.playing { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .card { transition: none; }
 }
+  .tabs { overflow-y: hidden; border-bottom: 0; box-shadow: inset 0 -1px 0 var(--line); }
+.tab[aria-pressed="true"] { position: static; }
 </style>
 </head>
 <body>
