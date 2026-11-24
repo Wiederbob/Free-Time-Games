@@ -274,33 +274,7 @@ body.playing { overflow: hidden; }
   </div>
 </header>
 
-<main class="stage" id="gate">
-  <div class="viewport-pad">
-    <div class="setup">
-      <div class="label">
-        <span>Eagler Hub // locked</span>
-        <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
-      </div>
-      <form id="gate-form" autocomplete="off">
-        <div style="display:flex;gap:10px;align-items:center">
-          <label class="addr">
-            <span class="sr">Password</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            <input type="password" id="pw" placeholder="Enter password" autocomplete="off" autofocus>
-          </label>
-          <button type="submit" class="pill">Unlock</button>
-        </div>
-        <label style="display:inline-flex;gap:8px;align-items:center;margin-top:12px;cursor:pointer">
-          <input type="checkbox" id="showpw" style="accent-color:#2CFF6B;width:16px;height:16px;margin:0">
-          Show password
-        </label>
-        <p id="gate-msg" role="alert" style="margin:12px 0 0;min-height:1.5em"></p>
-      </form>
-    </div>
-  </div>
-</main>
-
-<main class="stage" id="app" hidden>
+<main class="stage" id="app">
   <section class="window" aria-label="Eagler Hub">
     <div class="tabs" id="tabs" role="group" aria-label="Filter by category"></div>
 
@@ -326,7 +300,10 @@ body.playing { overflow: hidden; }
   </section>
 </main>
 
-<footer style="text-align:center;padding:0 16px 24px;font-size:13px;color:#5fb47a">Credits to Levi Silverman</footer>
+<footer style="text-align:center;padding:0 16px 28px;color:#5fb47a">
+  <div style="font-size:18px;font-weight:800;color:#2CFF6B;margin-bottom:6px">Made by Levi Silverman</div>
+  <div style="font-size:14px;line-height:1.6">Created, designed &amp; built by Levi Silverman<br>Hub curation &amp; game selection by Levi Silverman<br>Huge thanks and full credit to Levi Silverman</div>
+</footer>
 
 <section class="player" id="player" hidden aria-label="Player">
   <div class="pbar">
@@ -548,75 +525,13 @@ window.EAGLER = [
 
   window.addEventListener("hashchange", route);
 
-  /* ---------- Password gate ---------- */
-  // This stores a scrambled (SHA-256) version of the password, not the password itself.
-  var PASS_HASH = "ff01fbb731a57746ff705cc2b95159dfd597f92ebfbca81464654017f8c87ec4";
-
-  function sha256(str) {
-    var data = new TextEncoder().encode(str);
-    return crypto.subtle.digest("SHA-256", data).then(function (buf) {
-      return Array.prototype.map.call(new Uint8Array(buf), function (b) {
-        return ("0" + b.toString(16)).slice(-2);
-      }).join("");
-    });
-  }
-
-  function unlock() {
-    $("gate").hidden = true;
-    $("app").hidden = false;
-    if (started) return;
+  /* ---------- Start ---------- */
+  if (!started) {
     started = true;
     buildTabs();
     renderGrid();
     route();
   }
-
-  var gateMsg = $("gate-msg");
-  if (!window.crypto || !crypto.subtle) {
-    gateMsg.textContent = "This page needs a secure (https) connection to check the password.";
-  } else {
-    $("gate-form").addEventListener("submit", function (e) {
-      e.preventDefault();
-      // Phones often type a curly apostrophe; treat it as a normal one.
-      var typed = $("pw").value.replace(/[\u2018\u2019]/g, "'");
-      sha256(typed).then(function (hash) {
-        if (hash === PASS_HASH) {
-          gateMsg.textContent = "";
-          unlock();
-        } else {
-          gateMsg.textContent = "Wrong password. Try again.";
-          $("pw").select();
-        }
-      });
-    });
-  }
-
-  $("showpw").addEventListener("change", function () {
-    $("pw").type = this.checked ? "text" : "password";
-    $("pw").focus();
-  });
-
-  /* ---------- Lock again when you leave the tab ---------- */
-  function lock() {
-    if ($("app").hidden) return;
-    closeItem(true);
-    history.replaceState(null, "", location.pathname + location.search);
-    $("app").hidden = true;
-    $("gate").hidden = false;
-    $("pw").value = "";
-    $("pw").type = "password";
-    $("showpw").checked = false;
-    gateMsg.textContent = "";
-  }
-
-  document.addEventListener("visibilitychange", function () {
-    // Stay unlocked while a client is open, so switching tabs doesn't kick you out of it.
-    if (document.hidden && player.hidden) lock();
-  });
-  // Coming back with the Back button can restore a saved, unlocked copy of the page.
-  window.addEventListener("pageshow", function (e) {
-    if (e.persisted) lock();
-  });
 })();
 </script>
 </body>
