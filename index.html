@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Free Time Games</title>
+<title>Gatekeeper Games</title>
 <meta name="description" content="Free browser games. Pick one and play.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232CFF6B'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-/* Free Time Games: shared styles. Matches the dark terminal-green look of Free Time Browse. */
+/* Gatekeeper Games: shared styles. Matches the dark terminal-green look of Gatekeeper Browse. */
 
 :root {
   --bg: #030a05;
@@ -263,9 +263,9 @@ body.playing { overflow: hidden; }
   <div class="top-in">
     <a class="brand" href="#/">
       <span class="mark" aria-hidden="true">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#03110a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/></svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#03110a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V9a8 8 0 0 1 16 0v12"/><path d="M9 21V11a3 3 0 0 1 6 0v10"/><line x1="2" x2="22" y1="21" y2="21"/></svg>
       </span>
-      <span id="brand-name">Free Time Games</span>
+      <span id="brand-name">Gatekeeper Games</span>
     </a>
     <nav class="nav" aria-label="Main">
       <a href="#/" id="nav-games" aria-current="page">Games</a>
@@ -303,7 +303,7 @@ body.playing { overflow: hidden; }
 
   <section class="window" id="browser-view" aria-label="Browser" hidden>
     <div class="viewport">
-      <iframe class="bframe" id="bframe" title="Free Time Browse" hidden
+      <iframe class="bframe" id="bframe" title="Gatekeeper Browse" hidden
               allow="fullscreen; clipboard-read; clipboard-write; autoplay"
               allowfullscreen></iframe>
 
@@ -315,7 +315,7 @@ body.playing { overflow: hidden; }
           </div>
           <p>Add the link to your Replit browser at the top of index.html, then reload this page.</p>
 <pre><code>window.SITE = {
-  name: "Free Time Games",
+  name: "Gatekeeper Games",
   browserUrl: "https://your-app.replit.app"
 };</code></pre>
         </div>
@@ -361,7 +361,7 @@ body.playing { overflow: hidden; }
   Some sites block embedding, so a link to another site may show a blank frame.
 */
 window.SITE = {
-  name: "Free Time Games",
+  name: "Gatekeeper Games",
   browserUrl: "https://free-time-games--bobbywiederman.replit.app/"
 };
 
@@ -379,14 +379,13 @@ window.GAMES = [
   { id: "stickman-hook", title: "Stickman Hook", category: "Arcade", url: "games/stickman-hook.html", icon: "🪝" },
   { id: "subway-surfers-san-francisco", title: "Subway Surfers San Francisco", category: "Arcade", url: "games/subway-surfers-san-francisco.html", icon: "🚇" },
   { id: "superhot", title: "Superhot", category: "Action", url: "games/superhot.html", icon: "🔫" },
-  { id: "krillion", title: "Krillion", category: "Quiz", url: "https://krillion.io/", icon: "🦐" },
 ];
 </script>
 <script>
 (function () {
   "use strict";
 
-  var SITE = window.SITE || { name: "Free Time Games" };
+  var SITE = window.SITE || { name: "Gatekeeper Games" };
   var GAMES = window.GAMES || [];
 
   var $ = function (id) { return document.getElementById(id); };
