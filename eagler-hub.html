@@ -176,6 +176,7 @@ body.playing { overflow: hidden; }
   cursor: pointer;
   transition: border-color .15s, box-shadow .15s;
 }
+a.card { text-decoration: none; }
 .card:hover { border-color: var(--neon); box-shadow: 0 0 20px rgba(44, 255, 107, .18); }
 .card:focus-visible { outline-offset: 2px; }
 
@@ -221,6 +222,25 @@ body.playing { overflow: hidden; }
 }
 @media (prefers-reduced-motion: reduce) {
   .card { transition: none; }
+}
+
+
+/* Credits (Levi Silverman) */
+.credit {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  color: var(--dim); font-size: 13px; font-weight: 600; letter-spacing: .02em;
+}
+.credit .mark { width: 24px; height: 24px; border-radius: 7px; box-shadow: 0 0 12px rgba(44, 255, 107, .35); }
+.credit strong { color: var(--neon); font-weight: 800; }
+.foot {
+  flex-direction: column; gap: 6px; text-align: center;
+  padding: 0 16px 28px; font-size: 14px; line-height: 1.6;
+}
+.foot .big { font-size: 18px; font-weight: 800; color: var(--neon); display: flex; align-items: center; gap: 10px; }
+.foot .big .mark { width: 30px; height: 30px; }
+.pcredit {
+  padding: 7px 14px;
+  background: var(--panel); border-top: 1px solid var(--line);
 }
 
 /* Eagler Hub additions */
@@ -269,9 +289,9 @@ body.playing { overflow: hidden; }
   </section>
 </main>
 
-<footer style="text-align:center;padding:0 16px 28px;color:#5fb47a">
-  <div style="font-size:18px;font-weight:800;color:#2CFF6B;margin-bottom:6px">Made by Levi Silverman</div>
-  <div style="font-size:14px;line-height:1.6">Created, designed &amp; built by Levi Silverman<br>Hub curation &amp; game selection by Levi Silverman<br>Huge thanks and full credit to Levi Silverman</div>
+<footer class="credit foot">
+  <div class="big"><span class="mark" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#03110a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/></svg></span><span>Made by Levi Silverman</span></div>
+  <div>Created, designed &amp; built by Levi Silverman<br>Hub curation &amp; game selection by Levi Silverman<br>Huge thanks and full credit to Levi Silverman</div>
 </footer>
 
 <section class="player" id="player" hidden aria-label="Player">
@@ -285,6 +305,7 @@ body.playing { overflow: hidden; }
   <iframe id="frame" title="Eagler Hub"
           sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-popups allow-forms allow-downloads allow-modals"
           allow="fullscreen; autoplay; clipboard-read; clipboard-write" allowfullscreen></iframe>
+  <div class="credit pcredit"><span class="mark" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#03110a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/></svg></span><span>Free Time Games &middot; Made by <strong>Levi Silverman</strong></span></div>
 </section>
 
 <script>
@@ -303,14 +324,13 @@ body.playing { overflow: hidden; }
     url       Path to the file inside this repo, or a full https:// link.
     icon      Optional. An emoji shown on the card.
     tags      Optional. Extra words that search will match.
+    newtab    Optional. Set to true to open in its own tab instead of the player
+              (use this if a card says "This content is blocked").
 
   Some sites block being shown inside another page. If a card opens blank,
   use the New tab button at the top of the player.
 */
 window.EAGLER = [
-  { id: "eagler-26-2", title: "Eagler 26.2", category: "Eaglercraft", url: "games/eagler-26.2.html", icon: "⛏️" },
-  { id: "eagler-26-1-2", title: "Eagler 26.1.2", category: "Eaglercraft", url: "games/eagler-26.1.2.html", icon: "⛏️" },
-  { id: "eaglercraft-1-8", title: "Eaglercraft 1.8", category: "Eaglercraft", url: "games/eaglercraft1-8.html", icon: "⛏️" },
   { id: "astra-1", title: "Astra 1", category: "Astra", url: "games/Astra-1.html", icon: "⛏️" },
   { id: "astra-2", title: "Astra 2", category: "Astra", url: "games/Astra-2.html", icon: "⛏️" },
   { id: "tuff-client", title: "Tuff Client", category: "Clients", url: "games/Tuff-Client.html", icon: "⛏️" },
@@ -323,6 +343,9 @@ window.EAGLER = [
   { id: "eb-client", title: "EB Client", category: "Clients", url: "games/EB-Client.html", icon: "⛏️" },
   { id: "myven-client", title: "Myven Client", category: "Clients", url: "games/Myven-Client.html", icon: "⛏️" },
   { id: "precision-client", title: "Precision Client", category: "Clients", url: "games/Precision-Client.html", icon: "⛏️" },
+  { id: "eaglercraft-26-1-2", title: "Eaglercraft 26.1.2", category: "Minecraft HTMLs", url: "games/eagler-26.1.2.html", icon: "⛏️", newtab: true, tags: ["minecraft", "webgpu", "wasm", "html"] },
+  { id: "eaglercraft-26-2", title: "Eaglercraft 26.2", category: "Minecraft HTMLs", url: "games/eagler-26.2.html", icon: "⛏️", newtab: true, tags: ["minecraft", "webgpu", "wasm", "html"] },
+  { id: "eaglercraft-1-8", title: "Eaglercraft 1.8", category: "Minecraft HTMLs", url: "games/eaglercraft1-8.html", icon: "⛏️", newtab: true, tags: ["minecraft", "html", "1.8", "1.8.8"] },
 ];
 </script>
 <script>
@@ -384,8 +407,9 @@ window.EAGLER = [
 
     list.forEach(function (g) {
       var li = document.createElement("li");
-      var b = el("button", "card");
-      b.type = "button";
+      var b = g.newtab ? el("a", "card") : el("button", "card");
+      if (g.newtab) { b.href = g.url; b.target = "_blank"; b.rel = "noopener"; }
+      else b.type = "button";
 
       var art = el("span", "art");
       art.setAttribute("aria-hidden", "true");
@@ -401,7 +425,7 @@ window.EAGLER = [
       b.appendChild(el("span", "name", g.title));
       if (g.category) b.appendChild(el("span", "cat", g.category));
 
-      b.addEventListener("click", function () {
+      if (!g.newtab) b.addEventListener("click", function () {
         lastCard = b;
         cameFromGrid = true;
         location.hash = "#/" + encodeURIComponent(g.id);
