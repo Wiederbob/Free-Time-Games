@@ -213,36 +213,6 @@ body.playing { overflow: hidden; }
 }
 #frame { flex: 1; width: 100%; border: 0; background: #000; }
 
-/* ---------- Browser page ---------- */
-.urlpill {
-  flex: 1; min-width: 0;
-  padding: 8px 16px;
-  font-size: 14px; color: var(--text);
-  background: var(--panel);
-  border: 2px solid var(--line); border-radius: 999px;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.viewport { flex: 1; display: flex; flex-direction: column; min-height: 0; background: var(--bg); }
-.bframe { flex: 1; width: 100%; min-height: 520px; border: 0; background: #000; }
-.note { margin: 12px 4px 0; font-size: 13px; color: var(--dim); }
-
-.setup {
-  width: min(640px, 100%); margin: auto;
-  padding: 22px;
-  background: var(--panel);
-  border: 2px solid var(--line-strong); border-radius: 22px;
-  box-shadow: 0 0 28px rgba(44, 255, 107, .12);
-}
-.setup p { margin: 0 0 14px; }
-.setup pre {
-  margin: 0; padding: 14px; overflow-x: auto;
-  font: inherit; font-size: 13px; color: var(--neon);
-  background: var(--bg);
-  border: 1px solid var(--line); border-radius: 12px;
-}
-.setup code { font: inherit; }
-.viewport-pad { padding: 18px; display: flex; flex: 1; }
-
 /* ---------- Small screens ---------- */
 @media (max-width: 600px) {
   .top-in { grid-template-columns: 1fr auto; }
@@ -269,7 +239,6 @@ body.playing { overflow: hidden; }
     </a>
     <nav class="nav" aria-label="Main">
       <a href="#/" id="nav-games" aria-current="page">Games</a>
-      <a href="#/browser" id="nav-browser">Browser</a>
       <a href="eagler-hub.html">Eagler Hub</a>
     </nav>
     <span aria-hidden="true"></span>
@@ -301,27 +270,6 @@ body.playing { overflow: hidden; }
     </div>
   </section>
 
-  <section class="window" id="browser-view" aria-label="Browser" hidden>
-    <div class="viewport">
-      <iframe class="bframe" id="bframe" title="Gatekeeper Browse" hidden
-              allow="fullscreen; clipboard-read; clipboard-write; autoplay"
-              allowfullscreen></iframe>
-
-      <div class="viewport-pad" id="bsetup" hidden>
-        <div class="setup">
-          <div class="label">
-            <span>Browser // not linked</span>
-            <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
-          </div>
-          <p>Add the link to your Replit browser at the top of index.html, then reload this page.</p>
-<pre><code>window.SITE = {
-  name: "Gatekeeper Games",
-  browserUrl: "https://your-app.replit.app"
-};</code></pre>
-        </div>
-      </div>
-    </div>
-  </section>
 </main>
 
 <section class="player" id="player" hidden aria-label="Game player">
@@ -338,10 +286,7 @@ body.playing { overflow: hidden; }
 
 <script>
 /*
-  EDIT HERE: site name, browser link, and the list of games.
-
-  browserUrl   The link to your Replit browser (starts with https://).
-               Leave it empty and the Browser page shows setup instructions.
+  EDIT HERE: site name and the list of games.
 
   To add a game:
     1. Put its files in a folder under games/ (for example games/my-game/index.html).
@@ -349,7 +294,6 @@ body.playing { overflow: hidden; }
 
   Fields:
     id        Unique, lowercase, no spaces. Used in the page link (yoursite/#/my-game).
-              Do not use "browser" as an id.
     title     Name shown on the card.
     category  Groups games under a tab. Keep the spelling identical between games.
     url       Path to the game inside this repo, or a full https:// link.
@@ -361,8 +305,7 @@ body.playing { overflow: hidden; }
   Some sites block embedding, so a link to another site may show a blank frame.
 */
 window.SITE = {
-  name: "Gatekeeper Games",
-  browserUrl: "https://free-time-games--bobbywiederman.replit.app/"
+  name: "Gatekeeper Games"
 };
 
 window.GAMES = [
@@ -516,39 +459,8 @@ window.GAMES = [
     if (!keepFocus && lastCard && document.body.contains(lastCard)) lastCard.focus();
   }
 
-  /* ---------- Browser view ---------- */
-  var gamesView = $("games-view"), browserView = $("browser-view");
-  var bframe = $("bframe");
-  var browserUrl = typeof SITE.browserUrl === "string" ? SITE.browserUrl.trim() : "";
-  var browserOk = /^https?:\/\//i.test(browserUrl);
-  var browserLoaded = false;
-
-  if (browserOk) { bframe.hidden = false; } else { $("bsetup").hidden = false; }
-
-  function setCurrent(a, on) {
-    if (on) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
-  }
-
-  function showView(name) {
-    var isBrowser = name === "browser";
-    gamesView.hidden = isBrowser;
-    browserView.hidden = !isBrowser;
-    setCurrent($("nav-games"), !isBrowser);
-    setCurrent($("nav-browser"), isBrowser);
-    if (isBrowser && browserOk && !browserLoaded) {
-      browserLoaded = true;
-      bframe.src = browserUrl;
-    }
-    document.title = isBrowser ? "Browser | " + SITE.name : SITE.name;
-  }
-
+  /* ---------- Routing ---------- */
   function route() {
-    if (location.hash === "#/browser") {
-      closeGame(true);
-      showView("browser");
-      return;
-    }
-    showView("games");
     var g = currentGame();
     if (g) openGame(g); else closeGame();
   }
