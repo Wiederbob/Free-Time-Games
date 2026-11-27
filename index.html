@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Gatekeeper Games</title>
-<meta name="description" content="Free browser games. Pick one and play.">
+<meta name="description" content="Free browser games and Eagler clients. Pick one and play.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232CFF6B'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-/* Gatekeeper Games: shared styles. Matches the dark terminal-green look of Gatekeeper Browse. */
+/* Gatekeeper Games: one page, two views (Games + Eagler Hub). Dark terminal-green look. */
 
 :root {
   --bg: #030a05;
@@ -225,6 +225,24 @@ body.playing { overflow: hidden; }
 }
   .tabs { overflow-y: hidden; border-bottom: 0; box-shadow: inset 0 -1px 0 var(--line); }
 .tab[aria-pressed="true"] { position: static; }
+
+/* ---------- Added for the combined page ---------- */
+a.card { text-decoration: none; }
+.pbar { flex-wrap: wrap; }
+.credit {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  color: var(--dim); font-size: 13px; font-weight: 600; letter-spacing: .02em;
+}
+.credit .mark { width: 24px; height: 24px; border-radius: 7px; box-shadow: 0 0 12px rgba(44, 255, 107, .35); }
+.credit strong { color: var(--neon); font-weight: 800; }
+.foot {
+  flex-direction: column; gap: 6px; text-align: center;
+  padding: 0 16px 28px; font-size: 14px; line-height: 1.6;
+}
+.foot .big { font-size: 18px; font-weight: 800; color: var(--neon); display: flex; align-items: center; gap: 10px; }
+.foot .big .mark { width: 30px; height: 30px; }
+.pcredit { padding: 7px 14px; background: var(--panel); border-top: 1px solid var(--line); }
+body.playing .foot { display: none; }
 </style>
 </head>
 <body>
@@ -232,14 +250,12 @@ body.playing { overflow: hidden; }
 <header class="top">
   <div class="top-in">
     <a class="brand" href="#/">
-      <span class="mark" aria-hidden="true">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#03110a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V9a8 8 0 0 1 16 0v12"/><path d="M9 21V11a3 3 0 0 1 6 0v10"/><line x1="2" x2="22" y1="21" y2="21"/></svg>
-      </span>
+      <span class="mark" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#03110a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V9a8 8 0 0 1 16 0v12"/><path d="M9 21V11a3 3 0 0 1 6 0v10"/><line x1="2" x2="22" y1="21" y2="21"/></svg></span>
       <span id="brand-name">Gatekeeper Games</span>
     </a>
     <nav class="nav" aria-label="Main">
       <a href="#/" id="nav-games" aria-current="page">Games</a>
-      <a href="eagler-hub.html">Eagler Hub</a>
+      <a href="#/eagler" id="nav-eagler">Eagler Hub</a>
     </nav>
     <span aria-hidden="true"></span>
   </div>
@@ -247,59 +263,89 @@ body.playing { overflow: hidden; }
 
 <main class="stage">
   <section class="window" id="games-view" aria-label="Games">
-    <div class="tabs" id="tabs" role="group" aria-label="Filter by category"></div>
+    <div class="tabs" id="g-tabs" role="group" aria-label="Filter by category"></div>
 
     <div class="toolbar">
       <label class="addr">
         <span class="sr">Search games</span>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-        <input type="search" id="q" placeholder="Search games" autocomplete="off">
-        <span class="go" aria-hidden="true">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-        </span>
+        <input type="search" id="g-q" placeholder="Search games" autocomplete="off">
+        <span class="go" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
       </label>
     </div>
 
     <div class="content">
       <div class="label">
-        <span id="label" aria-live="polite">Games</span>
+        <span id="g-label" aria-live="polite">Games</span>
         <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
       </div>
-      <ul class="grid" id="grid"></ul>
-      <p class="empty" id="empty" hidden></p>
+      <ul class="grid" id="g-grid"></ul>
+      <p class="empty" id="g-empty" hidden></p>
+    </div>
+  </section>
+
+  <section class="window" id="eagler-view" aria-label="Eagler Hub" hidden>
+    <div class="tabs" id="e-tabs" role="group" aria-label="Filter by category"></div>
+
+    <div class="toolbar">
+      <label class="addr">
+        <span class="sr">Search Eagler Hub</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="search" id="e-q" placeholder="Search Eagler Hub" autocomplete="off">
+        <span class="go" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
+      </label>
+    </div>
+
+    <div class="content">
+      <div class="label">
+        <span id="e-label" aria-live="polite">Eagler Hub</span>
+        <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      </div>
+      <ul class="grid" id="e-grid"></ul>
+      <p class="empty" id="e-empty" hidden></p>
     </div>
   </section>
 
 </main>
 
-<section class="player" id="player" hidden aria-label="Game player">
+<footer class="credit foot">
+  <div class="big"><span class="mark" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#03110a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/></svg></span><span>Made by Levi Silverman</span></div>
+  <div>Created, designed &amp; built by Levi Silverman<br>Hub curation &amp; game selection by Levi Silverman<br>Huge thanks and full credit to Levi Silverman</div>
+</footer>
+
+<section class="player" id="player" hidden aria-label="Player">
   <div class="pbar">
-    <button type="button" class="pill" id="back">Back to games</button>
+    <button type="button" class="pill" id="back">Back</button>
     <h2 class="ptitle" id="ptitle"></h2>
     <button type="button" class="pill" id="reload">Restart</button>
+    <a class="pill" id="newtab" target="_blank" rel="noopener" hidden>New tab</a>
     <button type="button" class="pill" id="fs">Fullscreen</button>
   </div>
-  <iframe id="frame" title="Game"
-          sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-popups allow-forms"
-          allow="fullscreen; gamepad" allowfullscreen></iframe>
+  <iframe id="frame" title="Player" allowfullscreen></iframe>
+  <div class="credit pcredit"><span class="mark" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#03110a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/></svg></span><span>Gatekeeper Games &middot; Made by <strong>Levi Silverman</strong></span></div>
 </section>
 
 <script>
 /*
-  EDIT HERE: site name and the list of games.
+  EDIT HERE: site name and the two lists. Games and Eagler stuff are kept apart.
 
-  To add a game:
-    1. Put its files in a folder under games/ (for example games/my-game/index.html).
-    2. Add an entry to the list below. There is an example you can copy.
+  To add an item:
+    1. Put its file in the games/ folder (or use a full https:// link in url).
+    2. Add a line to GAMES (regular games) or EAGLER (Eagler clients) below.
 
-  Fields:
-    id        Unique, lowercase, no spaces. Used in the page link (yoursite/#/my-game).
+  Fields (same for both lists):
+    id        Unique, lowercase, no spaces. Used in the page link.
     title     Name shown on the card.
-    category  Groups games under a tab. Keep the spelling identical between games.
-    url       Path to the game inside this repo, or a full https:// link.
+    category  Groups items under a tab. Keep the spelling identical between items.
+    url       Path to the file inside this repo, or a full https:// link.
     icon      Optional. An emoji shown on the card.
     tags      Optional. Extra words that search will match.
     thumb     Optional. Path to an image to show instead of the icon.
+    newtab    Optional (works in either list). true = open in its own tab instead of
+              the player. Use it if a card says "This content is blocked".
+
+  Page links:  #/  = Games,   #/eagler  = Eagler Hub,
+               #/<id> = a game,   #/eagler/<id> = an Eagler client.
 
   Only add games you made, or games whose license lets you host or embed them.
   Some sites block embedding, so a link to another site may show a blank frame.
@@ -324,24 +370,36 @@ window.GAMES = [
   { id: "superhot", title: "Superhot", category: "Action", url: "games/superhot.html", icon: "🔫" },
   { id: "krillion", title: "Krillion", category: "Arcade", url: "games/Deep-Dive.html", icon: "🦐" },
 ];
+
+window.EAGLER = [
+  { id: "astra-1", title: "Astra 1", category: "Astra", url: "games/Astra-1.html", icon: "⛏️" },
+  { id: "astra-2", title: "Astra 2", category: "Astra", url: "games/Astra-2.html", icon: "⛏️" },
+  { id: "tuff-client", title: "Tuff Client", category: "Clients", url: "games/Tuff-Client.html", icon: "⛏️" },
+  { id: "resent-client", title: "Resent Client", category: "Clients", url: "games/Resent-Client.html", icon: "⛏️" },
+  { id: "eclipse-client", title: "Eclipse Client", category: "Clients", url: "games/Eclipse-Client.html", icon: "⛏️" },
+  { id: "larp-client", title: "Larp Client", category: "Clients", url: "games/Larp-Client.html", icon: "⛏️" },
+  { id: "pixel-1-12", title: "Pixel 1.12", category: "Clients", url: "games/Pixel-1.12.html", icon: "⛏️" },
+  { id: "aero-client", title: "Aero Client", category: "Clients", url: "games/Aero-Client.html", icon: "⛏️" },
+  { id: "shadow-client", title: "Shadow Client", category: "Clients", url: "games/Shadow-Client.html", icon: "⛏️" },
+  { id: "eb-client", title: "EB Client", category: "Clients", url: "games/EB-Client.html", icon: "⛏️" },
+  { id: "myven-client", title: "Myven Client", category: "Clients", url: "games/Myven-Client.html", icon: "⛏️" },
+  { id: "precision-client", title: "Precision Client", category: "Clients", url: "games/Precision-Client.html", icon: "⛏️" },
+  { id: "eaglercraft-26-1-2", title: "Eaglercraft 26.1.2", category: "Minecraft HTMLs", url: "games/eagler-26.1.2.html", icon: "⛏️", newtab: true, tags: ["minecraft", "webgpu", "wasm", "html"] },
+  { id: "eaglercraft-26-2", title: "Eaglercraft 26.2", category: "Minecraft HTMLs", url: "games/eagler-26.2.html", icon: "⛏️", newtab: true, tags: ["minecraft", "webgpu", "wasm", "html"] },
+  { id: "eaglercraft-1-8", title: "Eaglercraft 1.8", category: "Minecraft HTMLs", url: "games/eaglercraft1-8.html", icon: "⛏️", newtab: true, tags: ["minecraft", "html", "1.8", "1.8.8"] },
+];
 </script>
 <script>
 (function () {
   "use strict";
 
   var SITE = window.SITE || { name: "Gatekeeper Games" };
-  var GAMES = window.GAMES || [];
-
   var $ = function (id) { return document.getElementById(id); };
-  var grid = $("grid"), tabs = $("tabs"), label = $("label"), empty = $("empty");
-  var q = $("q"), player = $("player"), frame = $("frame"), ptitle = $("ptitle");
 
-  var state = { cat: "All", query: "" };
+  var player = $("player"), frame = $("frame"), ptitle = $("ptitle");
+  var newtab = $("newtab"), backBtn = $("back");
   var cameFromGrid = false;
-  var lastCard = null;
-
-  document.title = SITE.name;
-  $("brand-name").textContent = SITE.name;
+  var active = null;   // the section whose item is open in the player
 
   function el(tag, cls, text) {
     var n = document.createElement(tag);
@@ -350,47 +408,70 @@ window.GAMES = [
     return n;
   }
 
-  /* ---------- Category tabs ---------- */
-  function buildTabs() {
-    var cats = ["All"];
-    GAMES.forEach(function (g) {
+  /* One Section = one view (tabs + search + grid). Games and Eagler Hub each get their own. */
+  function Section(cfg) {
+    var s = this;
+    s.cfg = cfg;
+    s.items = cfg.items || [];
+    s.state = { cat: "All", query: "" };
+    s.lastCard = null;
+    s.view = $(cfg.view);
+    s.tabs = $(cfg.p + "-tabs");
+    s.grid = $(cfg.p + "-grid");
+    s.label = $(cfg.p + "-label");
+    s.empty = $(cfg.p + "-empty");
+    s.q = $(cfg.p + "-q");
+
+    s.q.addEventListener("input", function () {
+      s.state.query = s.q.value.trim().toLowerCase();
+      s.renderGrid();
+    });
+    s.buildTabs();
+    s.renderGrid();
+  }
+
+  Section.prototype.find = function (id) {
+    return this.items.filter(function (g) { return g.id === id; })[0] || null;
+  };
+
+  Section.prototype.buildTabs = function () {
+    var s = this, cats = ["All"];
+    s.items.forEach(function (g) {
       if (g.category && cats.indexOf(g.category) < 0) cats.push(g.category);
     });
     cats.forEach(function (c) {
-      var b = el("button", "tab", c === "All" ? "All games" : c);
+      var b = el("button", "tab", c === "All" ? s.cfg.allLabel : c);
       b.type = "button";
       b.dataset.cat = c;
-      b.setAttribute("aria-pressed", String(c === state.cat));
+      b.setAttribute("aria-pressed", String(c === s.state.cat));
       b.addEventListener("click", function () {
-        state.cat = c;
-        syncTabs();
-        renderGrid();
+        s.state.cat = c;
+        Array.prototype.forEach.call(s.tabs.children, function (t) {
+          t.setAttribute("aria-pressed", String(t.dataset.cat === s.state.cat));
+        });
+        s.renderGrid();
       });
-      tabs.appendChild(b);
+      s.tabs.appendChild(b);
     });
-  }
-  function syncTabs() {
-    Array.prototype.forEach.call(tabs.children, function (b) {
-      b.setAttribute("aria-pressed", String(b.dataset.cat === state.cat));
-    });
-  }
+  };
 
-  /* ---------- Game grid ---------- */
-  function matches(g) {
-    if (state.cat !== "All" && g.category !== state.cat) return false;
-    if (!state.query) return true;
+  Section.prototype.matches = function (g) {
+    if (this.state.cat !== "All" && g.category !== this.state.cat) return false;
+    if (!this.state.query) return true;
     var hay = (g.title + " " + (g.category || "") + " " + (g.tags || []).join(" ")).toLowerCase();
-    return hay.indexOf(state.query) > -1;
-  }
+    return hay.indexOf(this.state.query) > -1;
+  };
 
-  function renderGrid() {
-    var list = GAMES.filter(matches);
-    grid.textContent = "";
+  Section.prototype.renderGrid = function () {
+    var s = this, c = s.cfg;
+    var list = s.items.filter(function (g) { return s.matches(g); });
+    s.grid.textContent = "";
 
     list.forEach(function (g) {
       var li = document.createElement("li");
-      var b = el("button", "card");
-      b.type = "button";
+      var b = g.newtab ? el("a", "card") : el("button", "card");
+      if (g.newtab) { b.href = g.url; b.target = "_blank"; b.rel = "noopener"; }
+      else b.type = "button";
 
       var art = el("span", "art");
       art.setAttribute("aria-hidden", "true");
@@ -406,81 +487,126 @@ window.GAMES = [
       b.appendChild(el("span", "name", g.title));
       if (g.category) b.appendChild(el("span", "cat", g.category));
 
-      b.addEventListener("click", function () {
-        lastCard = b;
+      if (!g.newtab) b.addEventListener("click", function () {
+        s.lastCard = b;
         cameFromGrid = true;
-        location.hash = "#/" + encodeURIComponent(g.id);
+        location.hash = c.itemHash + encodeURIComponent(g.id);
       });
 
       li.appendChild(b);
-      grid.appendChild(li);
+      s.grid.appendChild(li);
     });
 
-    var total = GAMES.length;
+    var total = s.items.length;
     if (!total) {
-      label.textContent = "Games // none yet";
-      empty.textContent = "No games yet. Add one in the games list at the top of index.html.";
+      s.label.textContent = c.name + " // none yet";
+      s.empty.textContent = c.emptyNone;
     } else if (list.length === total) {
-      label.textContent = "Games // " + total + " loaded";
+      s.label.textContent = c.name + " // " + total + " loaded";
     } else {
-      label.textContent = "Games // " + list.length + " of " + total + " match";
+      s.label.textContent = c.name + " // " + list.length + " of " + total + " match";
     }
-    if (total) empty.textContent = "No games match. Clear the search or pick All games.";
-    empty.hidden = list.length > 0;
+    if (total) s.empty.textContent = c.emptyNoMatch;
+    s.empty.hidden = list.length > 0;
+  };
+
+  var games = new Section({
+    p: "g", view: "games-view", name: "Games", allLabel: "All games",
+    items: window.GAMES, itemHash: "#/", home: "#/", backText: "Back to games",
+    emptyNone: "No games yet. Add one in the GAMES list at the top of index.html.",
+    emptyNoMatch: "No games match. Clear the search or pick All games.",
+    sandbox: "allow-scripts allow-same-origin allow-pointer-lock allow-popups allow-forms",
+    allow: "fullscreen; gamepad"
+  });
+
+  var eagler = new Section({
+    p: "e", view: "eagler-view", name: "Eagler Hub", allLabel: "All",
+    items: window.EAGLER, itemHash: "#/eagler/", home: "#/eagler", backText: "Back to Eagler Hub",
+    emptyNone: "Nothing here yet. Add one in the EAGLER list at the top of index.html.",
+    emptyNoMatch: "No matches. Clear the search or pick All.",
+    sandbox: "allow-scripts allow-same-origin allow-pointer-lock allow-popups allow-forms allow-downloads allow-modals",
+    allow: "fullscreen; autoplay; clipboard-read; clipboard-write",
+    showNewtab: true
+  });
+
+  /* ---------- Routing ----------
+     #/            Games            #/<id>          a game
+     #/eagler      Eagler Hub       #/eagler/<id>   an Eagler client   */
+  function decode(s) { try { return decodeURIComponent(s); } catch (e) { return null; } }
+
+  function parse() {
+    var h = location.hash, m;
+    if ((m = h.match(/^#\/eagler\/(.+)$/))) {
+      var id = decode(m[1]);
+      return { sec: eagler, item: id === null ? null : eagler.find(id) };
+    }
+    if (/^#\/eagler\/?$/.test(h)) return { sec: eagler, item: null };
+    if ((m = h.match(/^#\/(.+)$/))) {
+      var gid = decode(m[1]);
+      return { sec: games, item: gid === null ? null : games.find(gid) };
+    }
+    return { sec: games, item: null };
   }
 
-  /* ---------- Player ---------- */
-  function currentGame() {
-    var m = location.hash.match(/^#\/(.+)$/);
-    if (!m) return null;
-    var id;
-    try { id = decodeURIComponent(m[1]); } catch (e) { return null; }
-    return GAMES.filter(function (g) { return g.id === id; })[0] || null;
+  function showView(sec) {
+    games.view.hidden = sec !== games;
+    eagler.view.hidden = sec !== eagler;
+    $("nav-games").setAttribute("aria-current", sec === games ? "page" : "false");
+    $("nav-eagler").setAttribute("aria-current", sec === eagler ? "page" : "false");
+    if (player.hidden) document.title = sec === eagler ? "Eagler Hub | " + SITE.name : SITE.name;
   }
 
-  function openGame(g) {
-    if (frame.getAttribute("data-id") !== g.id) {
-      frame.setAttribute("data-id", g.id);
+  function openItem(sec, g) {
+    active = sec;
+    if (frame.getAttribute("data-id") !== sec.cfg.p + ":" + g.id) {
+      frame.setAttribute("data-id", sec.cfg.p + ":" + g.id);
+      frame.setAttribute("sandbox", sec.cfg.sandbox);
+      frame.setAttribute("allow", sec.cfg.allow);
       frame.title = g.title;
       frame.src = g.url;
     }
     ptitle.textContent = g.title;
+    backBtn.textContent = sec.cfg.backText;
+    newtab.hidden = !sec.cfg.showNewtab;
+    newtab.href = g.url;
     player.hidden = false;
     document.body.classList.add("playing");
-    document.title = g.title + " | " + SITE.name;
+    document.title = g.title + " | " + (sec === eagler ? "Eagler Hub | " : "") + SITE.name;
   }
 
-  function closeGame(keepFocus) {
+  function closeItem() {
     if (player.hidden) return;
+    var sec = active;
     player.hidden = true;
     frame.removeAttribute("data-id");
     frame.src = "about:blank";
     document.body.classList.remove("playing");
-    document.title = SITE.name;
-    if (!keepFocus && lastCard && document.body.contains(lastCard)) lastCard.focus();
+    active = null;
+    if (sec && sec.lastCard && document.body.contains(sec.lastCard)) sec.lastCard.focus();
   }
 
-  /* ---------- Routing ---------- */
   function route() {
-    var g = currentGame();
-    if (g) openGame(g); else closeGame();
+    var r = parse();
+    showView(r.sec);
+    if (r.item) openItem(r.sec, r.item); else closeItem();
   }
 
+  /* ---------- Player controls ---------- */
   frame.addEventListener("load", function () {
     if (player.hidden) return;
     try { frame.contentWindow.focus(); } catch (e) { frame.focus(); }
   });
 
-  $("back").addEventListener("click", function () {
+  backBtn.addEventListener("click", function () {
     if (cameFromGrid) { cameFromGrid = false; history.back(); }
-    else { location.hash = "#/"; }
+    else { location.hash = active ? active.cfg.home : "#/"; }
   });
 
   $("reload").addEventListener("click", function () {
-    var g = currentGame();
-    if (!g) return;
+    var r = parse();
+    if (!r.item) return;
     frame.src = "about:blank";
-    setTimeout(function () { frame.src = g.url; }, 30);
+    setTimeout(function () { frame.src = r.item.url; }, 30);
   });
 
   var fs = $("fs");
@@ -491,19 +617,10 @@ window.GAMES = [
   }
 
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && !player.hidden && !document.fullscreenElement) $("back").click();
-  });
-
-  /* ---------- Search and startup ---------- */
-  q.addEventListener("input", function () {
-    state.query = q.value.trim().toLowerCase();
-    renderGrid();
+    if (e.key === "Escape" && !player.hidden && !document.fullscreenElement) backBtn.click();
   });
 
   window.addEventListener("hashchange", route);
-
-  buildTabs();
-  renderGrid();
   route();
 })();
 </script>
