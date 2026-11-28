@@ -241,6 +241,8 @@ a.card { text-decoration: none; }
 }
 .foot .big { font-size: 18px; font-weight: 800; color: var(--neon); display: flex; align-items: center; gap: 10px; }
 .foot .big .mark { width: 30px; height: 30px; }
+.chatbar { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; border-bottom: 1px solid var(--line); font-weight: 700; color: var(--neon); }
+#chat-frame { display: block; width: 100%; height: calc(100vh - 190px); min-height: 480px; border: 0; background: #000; }
 .pcredit { padding: 7px 14px; background: var(--panel); border-top: 1px solid var(--line); }
 body.playing .foot { display: none; }
 </style>
@@ -256,6 +258,7 @@ body.playing .foot { display: none; }
     <nav class="nav" aria-label="Main">
       <a href="#/" id="nav-games" aria-current="page">Games</a>
       <a href="#/eagler" id="nav-eagler">Eagler Hub</a>
+      <a href="#/chat" id="nav-chat">Chat</a>
     </nav>
     <span aria-hidden="true"></span>
   </div>
@@ -304,6 +307,14 @@ body.playing .foot { display: none; }
       <ul class="grid" id="e-grid"></ul>
       <p class="empty" id="e-empty" hidden></p>
     </div>
+  </section>
+
+  <section class="window" id="chat-view" aria-label="Chat" hidden>
+    <div class="chatbar">
+      <span>Chat</span>
+      <a class="pill" href="https://gatechat-ftfgwsxh.manus.space" target="_blank" rel="noopener">New tab</a>
+    </div>
+    <iframe id="chat-frame" title="Chat" allow="fullscreen; clipboard-read; clipboard-write; microphone; camera" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads"></iframe>
   </section>
 
 </main>
@@ -529,6 +540,9 @@ window.EAGLER = [
     showNewtab: true
   });
 
+  var chat = { view: $("chat-view") };
+  var chatFrame = $("chat-frame");
+
   /* ---------- Routing ----------
      #/            Games            #/<id>          a game
      #/eagler      Eagler Hub       #/eagler/<id>   an Eagler client   */
@@ -536,6 +550,7 @@ window.EAGLER = [
 
   function parse() {
     var h = location.hash, m;
+    if (/^#\/chat\/?$/.test(h)) return { sec: chat, item: null };
     if ((m = h.match(/^#\/eagler\/(.+)$/))) {
       var id = decode(m[1]);
       return { sec: eagler, item: id === null ? null : eagler.find(id) };
@@ -551,10 +566,13 @@ window.EAGLER = [
   function showView(sec) {
     games.view.hidden = sec !== games;
     eagler.view.hidden = sec !== eagler;
+    chat.view.hidden = sec !== chat;
+    $("nav-chat").setAttribute("aria-current", sec === chat ? "page" : "false");
+    if (sec === chat && !chatFrame.getAttribute("src")) chatFrame.src = "https://gatechat-ftfgwsxh.manus.space";
     $("foot-credit").hidden = sec !== eagler;
     $("nav-games").setAttribute("aria-current", sec === games ? "page" : "false");
     $("nav-eagler").setAttribute("aria-current", sec === eagler ? "page" : "false");
-    if (player.hidden) document.title = sec === eagler ? "Eagler Hub | " + SITE.name : SITE.name;
+    if (player.hidden) document.title = sec === eagler ? "Eagler Hub | " + SITE.name : sec === chat ? "Chat | " + SITE.name : SITE.name;
   }
 
   function openItem(sec, g) {
